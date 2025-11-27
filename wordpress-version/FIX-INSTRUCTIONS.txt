@@ -1,0 +1,97 @@
+================================================================
+🔧 LOGIN/REGISTER BUTTONS DIKHANE KE LIYE - IMPORTANT FIX
+================================================================
+
+Agar aapko Login aur Sign Up buttons nahi dikh rahe, toh yeh steps follow karein:
+
+OPTION 1: UPDATED INDEX.PHP USE KAREIN (RECOMMENDED)
+-----------------------------------------------------
+1. Latest wordpress-version.zip download karein
+2. Apne server pe extract karein
+3. index.php file ko replace kar dein
+4. Browser refresh karein (Ctrl+F5 ya Cmd+Shift+R)
+5. Ab Login aur Sign Up buttons clearly dikhne chahiye!
+
+
+OPTION 2: DEBUG VERSION TEST KAREIN
+------------------------------------
+Agar abhi bhi issue hai, toh pehle yeh test karein:
+
+1. Browser mein yeh URL open karein:
+   yourdomain.com/index-debug.php
+
+2. Yeh page aapko dikhayega:
+   - User logged in hai ya nahi
+   - Session information
+   - FORCEFULLY saare buttons display honge
+
+3. Agar debug page pe buttons dikh rahe hain, matlab:
+   - Code sahi hai
+   - Main index.php ko replace karna padega
+
+
+OPTION 3: BROWSER CACHE CLEAR KAREIN
+-------------------------------------
+Kabhi kabhi purana version browser cache mein rehta hai:
+
+1. Browser mein Ctrl+Shift+Delete (Windows) ya Cmd+Shift+Delete (Mac)
+2. "Cached images and files" select karein
+3. Clear karein
+4. Page reload karein (Ctrl+F5)
+
+
+OPTION 4: CHECK SESSION STATE
+------------------------------
+Ho sakta hai aap already logged in hain as a user:
+
+1. Browser mein yourdomain.com/user-logout.php kholo
+2. Logout ho jayega
+3. Phir index.php pe wapas jao
+4. Ab Login aur Sign Up buttons dikhne chahiye
+
+
+TECHNICAL FIX (If you have FTP/cPanel access):
+-----------------------------------------------
+Agar aap manually fix karna chahte hain:
+
+1. cPanel File Manager mein jao
+2. index.php file ko edit karo
+3. Line 93 se 132 tak ka code replace karo with:
+
+            <div class="auth-buttons">
+                <?php 
+                $user_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+                
+                if ($user_logged_in): 
+                ?>
+                    <a href="user-dashboard.php">Dashboard</a>
+                    <a href="user-logout.php" style="color: #dc2626;">Logout</a>
+                <?php else: ?>
+                    <a href="user-login.php" style="color: #4b5563; font-weight: 600;">Login</a>
+                    <a href="register.php" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; display: inline-block; font-weight: 600;">Sign Up</a>
+                <?php endif; ?>
+                
+                <a href="login.php" style="color: #999; font-size: 12px; border-left: 1px solid #ddd; padding-left: 15px; margin-left: 10px;">Admin</a>
+            </div>
+
+4. Save karein
+
+
+STILL NOT WORKING?
+------------------
+Agar phir bhi nahi dikh raha, toh mujhe yeh details dein:
+
+1. index-debug.php ka screenshot
+2. Browser console errors (F12 press karke Console tab dekho)
+3. Kya aap already logged in hain?
+4. Which browser use kar rahe hain?
+
+
+================================================================
+📦 FILES IN THIS PACKAGE:
+================================================================
+- index.php          → Main homepage (UPDATED with fixed navigation)
+- index-debug.php    → Debug version to test buttons
+- All other files    → Complete working website
+
+================================================================
