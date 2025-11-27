@@ -1,10 +1,21 @@
 /**
  * WoodMart Clone - Main JavaScript
- * Handles all frontend interactions
+ * Advanced AJAX functionality for filters, cart, and product pages
  */
 
 (function() {
     'use strict';
+
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
+    
+    const CONFIG = {
+        API_BASE: '/api',
+        CART_API: '/api/cart.php',
+        PRODUCTS_API: '/api/products.php',
+        DEBOUNCE_DELAY: 300
+    };
 
     // ==========================================
     // INITIALIZATION
@@ -14,10 +25,14 @@
         initTooltips();
         initLazyLoading();
         initAjaxCart();
+        initMiniCart();
         initWishlist();
         initQuickView();
+        initAjaxFilters();
+        initProductVariations();
         initSearchFilters();
         initMobileMenu();
+        loadCartCount();
     });
 
     // ==========================================
