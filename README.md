@@ -23,8 +23,8 @@ Ek modern aur feature-rich gaming news aur casino review website, gamingtoday.co
 ## 🚀 Quick Start
 
 ### Access Points
-- **Website**: https://wordpress-gaming.preview.emergentagent.com
-- **Admin Panel**: https://wordpress-gaming.preview.emergentagent.com/admin
+- **Website**: https://reviewhub-22.preview.emergentagent.com
+- **Admin Panel**: https://reviewhub-22.preview.emergentagent.com/admin
 
 ### Sample Data Included
 - ✅ 3 Categories (Casino, Sports Betting, Industry News)
