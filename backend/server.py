@@ -110,6 +110,7 @@ class UserReview(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     casino_id: str
     user_name: str
+    user_avatar: Optional[str] = None
     rating: float
     title: str
     comment: str
@@ -122,6 +123,7 @@ class UserReview(BaseModel):
 class UserReviewCreate(BaseModel):
     casino_id: str
     user_name: str
+    user_avatar: Optional[str] = None
     rating: float
     title: str
     comment: str
