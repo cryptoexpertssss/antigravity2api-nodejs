@@ -24,6 +24,26 @@ const ReviewForm = ({ casinoId, casinoName, onClose }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formDataObj = new FormData();
+    formDataObj.append('file', file);
+
+    setUploadingAvatar(true);
+    try {
+      const response = await axios.post(`${API}/upload`, formDataObj);
+      setFormData(prev => ({ ...prev, user_avatar: response.data.url }));
+      toast.success("Profile picture uploaded successfully");
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      toast.error("Failed to upload profile picture");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const handleProChange = (index, value) => {
     const newPros = [...formData.pros];
     newPros[index] = value;
