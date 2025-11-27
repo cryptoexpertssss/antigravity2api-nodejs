@@ -729,9 +729,15 @@
     // ==========================================
     
     function updateCartCount(count) {
-        document.querySelectorAll('.badge.bg-primary').forEach(badge => {
-            if (badge.closest('[href*="cart"]')) {
-                badge.textContent = count;
+        document.querySelectorAll('[data-cart-count]').forEach(badge => {
+            badge.textContent = count || 0;
+        });
+        
+        // Also update any badge inside cart links
+        document.querySelectorAll('.badge').forEach(badge => {
+            const link = badge.closest('a[href*="cart"]');
+            if (link) {
+                badge.textContent = count || 0;
             }
         });
     }
