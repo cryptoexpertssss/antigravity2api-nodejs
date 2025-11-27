@@ -46,29 +46,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         CREATE TABLE IF NOT EXISTS casinos (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(100) NOT NULL,
-            rank INT NOT NULL,
-            logo_url VARCHAR(255),
-            images TEXT,
-            offer_title VARCHAR(255),
-            offer_details TEXT,
-            features TEXT,
-            promo_code VARCHAR(50),
-            claim_link VARCHAR(255),
             rating DECIMAL(2,1) DEFAULT 5.0,
-            is_featured BOOLEAN DEFAULT FALSE,
+            bonus VARCHAR(255),
+            description TEXT,
+            affiliate_link VARCHAR(255),
+            logo_url VARCHAR(255),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE IF NOT EXISTS reviews (
             id INT AUTO_INCREMENT PRIMARY KEY,
             casino_id INT NOT NULL,
-            user_name VARCHAR(100) NOT NULL,
-            user_avatar VARCHAR(255),
+            user_id INT,
             rating DECIMAL(2,1) NOT NULL,
-            title VARCHAR(255) NOT NULL,
-            comment TEXT NOT NULL,
-            pros TEXT,
-            cons TEXT,
+            review_text TEXT NOT NULL,
             status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (casino_id) REFERENCES casinos(id) ON DELETE CASCADE
@@ -77,27 +68,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         CREATE TABLE IF NOT EXISTS affiliate_links (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(100) NOT NULL,
-            casino_id INT,
             url VARCHAR(255) NOT NULL,
             description TEXT,
-            clicks INT DEFAULT 0,
-            is_active BOOLEAN DEFAULT TRUE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (casino_id) REFERENCES casinos(id) ON DELETE SET NULL
+            category VARCHAR(50) DEFAULT 'casino',
+            status ENUM('active', 'inactive') DEFAULT 'active',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
 
-        CREATE TABLE IF NOT EXISTS advertisements (
+        CREATE TABLE IF NOT EXISTS ads (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            position ENUM('header', 'sidebar', 'footer', 'in-content') NOT NULL,
-            image_url VARCHAR(255) NOT NULL,
-            link_url VARCHAR(255) NOT NULL,
-            alt_text VARCHAR(255),
-            is_active BOOLEAN DEFAULT TRUE,
-            impressions INT DEFAULT 0,
-            clicks INT DEFAULT 0,
-            start_date DATE,
-            end_date DATE,
+            title VARCHAR(100) NOT NULL,
+            code TEXT NOT NULL,
+            position ENUM('header', 'sidebar', 'footer', 'article-top', 'article-middle', 'article-bottom') NOT NULL,
+            status ENUM('active', 'inactive') DEFAULT 'active',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         ";
