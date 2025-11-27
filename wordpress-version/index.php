@@ -49,6 +49,27 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         .footer { background: #1f2937; color: white; padding: 40px 20px; margin-top: 60px; }
         .footer-container { max-width: 1200px; margin: 0 auto; }
         .footer p { color: #9ca3af; text-align: center; }
+        .slider-container { position: relative; max-width: 100%; margin: 0 auto; overflow: hidden; background: #000; }
+        .slider-wrapper { display: flex; transition: transform 0.5s ease-in-out; }
+        .slide { min-width: 100%; height: 500px; position: relative; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+        .slide-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; width: 80%; max-width: 800px; }
+        .slide-content h2 { font-size: 48px; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); }
+        .slide-content p { font-size: 20px; margin-bottom: 30px; text-shadow: 1px 1px 4px rgba(0,0,0,0.8); }
+        .slide-btn { display: inline-block; padding: 15px 40px; background: #3b82f6; color: white; text-decoration: none; border-radius: 50px; font-weight: 700; transition: background 0.3s; }
+        .slide-btn:hover { background: #2563eb; }
+        .slider-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 10; }
+        .slider-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.3s; }
+        .slider-dot.active { background: white; width: 30px; border-radius: 6px; }
+        .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.3); color: white; border: none; font-size: 30px; padding: 15px 20px; cursor: pointer; z-index: 10; transition: background 0.3s; }
+        .slider-arrow:hover { background: rgba(255,255,255,0.5); }
+        .slider-arrow.prev { left: 20px; }
+        .slider-arrow.next { right: 20px; }
+        @media (max-width: 768px) {
+            .slide { height: 400px; }
+            .slide-content h2 { font-size: 32px; }
+            .slide-content p { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -78,24 +99,77 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <?php if($featured): ?>
-    <div class="hero">
-        <div class="hero-container">
-            <div>
-                <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;">Featured Story</span>
-                <h1><?= htmlspecialchars($featured['title']) ?></h1>
-                <p><?= htmlspecialchars($featured['excerpt']) ?></p>
-                <a href="article.php?slug=<?= $featured['slug'] ?>" class="btn">Read Full Story →</a>
+    <!-- Hero Slider -->
+    <div class="slider-container">
+        <div class="slider-wrapper">
+            <?php
+            // Get top 4 featured articles for slider
+            $slider_articles = $pdo->query("SELECT * FROM articles WHERE status='published' ORDER BY created_at DESC LIMIT 4")->fetchAll();
+            if(empty($slider_articles)) {
+                // Default slides if no articles
+                $slider_articles = [
+                    ['title' => 'Welcome to GamingToday', 'excerpt' => 'Your ultimate destination for gaming news, casino reviews, and exclusive bonuses!', 'featured_image' => 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200', 'slug' => '#'],
+                    ['title' => 'Top Casino Rankings', 'excerpt' => 'Discover the best online casinos with verified reviews and ratings', 'featured_image' => 'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=1200', 'slug' => 'casinos.php'],
+                    ['title' => 'Latest Gaming News', 'excerpt' => 'Stay updated with breaking news from the gaming industry', 'featured_image' => 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200', 'slug' => '#'],
+                ];
+            }
+            foreach($slider_articles as $index => $slide): 
+            ?>
+            <div class="slide">
+                <img src="<?= htmlspecialchars($slide['featured_image'] ?? 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200') ?>" alt="<?= htmlspecialchars($slide['title']) ?>">
+                <div class="slide-content">
+                    <h2><?= htmlspecialchars($slide['title']) ?></h2>
+                    <p><?= htmlspecialchars($slide['excerpt']) ?></p>
+                    <a href="<?= isset($slide['slug']) && $slide['slug'] != '#' ? 'article.php?slug=' . htmlspecialchars($slide['slug']) : '#' ?>" class="slide-btn">Explore Now →</a>
+                </div>
             </div>
-            <?php if($featured['featured_image']): ?>
-            <div>
-                <img src="<?= htmlspecialchars($featured['featured_image']) ?>" alt="<?= htmlspecialchars($featured['title']) ?>">
-            </div>
-            <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+        
+        <button class="slider-arrow prev" onclick="moveSlide(-1)">‹</button>
+        <button class="slider-arrow next" onclick="moveSlide(1)">›</button>
+        
+        <div class="slider-nav">
+            <?php for($i = 0; $i < count($slider_articles); $i++): ?>
+                <div class="slider-dot <?= $i === 0 ? 'active' : '' ?>" onclick="goToSlide(<?= $i ?>)"></div>
+            <?php endfor; ?>
         </div>
     </div>
-    <?php endif; ?>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            if (n >= totalSlides) currentSlide = 0;
+            if (n < 0) currentSlide = totalSlides - 1;
+            
+            const slider = document.querySelector('.slider-wrapper');
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function moveSlide(direction) {
+            currentSlide += direction;
+            showSlide(currentSlide);
+        }
+
+        function goToSlide(n) {
+            currentSlide = n;
+            showSlide(n);
+        }
+
+        // Auto-play slider every 5 seconds
+        setInterval(() => {
+            currentSlide++;
+            showSlide(currentSlide);
+        }, 5000);
+    </script>
 
     <!-- Latest Articles -->
     <div class="container">
