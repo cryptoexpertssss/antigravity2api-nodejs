@@ -175,6 +175,8 @@ const ReviewList = ({ casinoId }) => {
                     )}
                   </div>
                 )}
+              </div>
+            </div>
           </div>
         ))}
       </div>
