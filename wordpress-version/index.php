@@ -24,9 +24,10 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 28px; font-weight: 800; color: #1a1a1a; text-decoration: none; }
         .logo span { color: #3b82f6; }
-        .nav-links { display: flex; gap: 30px; align-items: center; }
-        .nav-links a { color: #4b5563; text-decoration: none; font-weight: 600; font-size: 14px; transition: color 0.2s; }
+        .nav-links { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; }
+        .nav-links a { color: #4b5563; text-decoration: none; font-weight: 600; font-size: 14px; transition: color 0.2s; white-space: nowrap; }
         .nav-links a:hover { color: #3b82f6; }
+        .auth-buttons { display: flex; gap: 15px; align-items: center; margin-left: auto; }
         .hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 60px 20px; color: white; }
         .hero-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
         .hero h1 { font-size: 48px; margin-bottom: 20px; line-height: 1.2; }
