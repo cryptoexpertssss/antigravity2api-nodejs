@@ -78,23 +78,26 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.php" class="logo">Gaming<span>Today</span></a>
+            
             <div class="nav-links">
                 <a href="index.php">Home</a>
-                <a href="casinos.php">Casino Rankings</a>
-                <?php foreach(array_slice($categories, 0, 3) as $cat): ?>
+                <a href="casinos.php">Casinos</a>
+                <?php foreach(array_slice($categories, 0, 2) as $cat): ?>
                     <a href="category.php?id=<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></a>
                 <?php endforeach; ?>
-                
+            </div>
+            
+            <div class="auth-buttons">
                 <?php if (isUserLoggedIn()): ?>
-                    <a href="user-dashboard.php">My Dashboard</a>
+                    <a href="user-dashboard.php">Dashboard</a>
                     <a href="user-logout.php" style="color: #dc2626;">Logout</a>
                 <?php else: ?>
-                    <a href="user-login.php">Login</a>
-                    <a href="register.php" style="background: #3b82f6; color: white; padding: 8px 16px; border-radius: 8px;">Sign Up</a>
+                    <a href="user-login.php" style="color: #4b5563;">Login</a>
+                    <a href="register.php" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; display: inline-block;">Sign Up</a>
                 <?php endif; ?>
                 
                 <?php if (shouldShowAdminLink()): ?>
-                    <a href="login.php" style="color: #666; font-size: 12px;">Admin</a>
+                    <a href="login.php" style="color: #999; font-size: 12px; border-left: 1px solid #ddd; padding-left: 15px; margin-left: 10px;">Admin</a>
                 <?php endif; ?>
             </div>
         </div>
