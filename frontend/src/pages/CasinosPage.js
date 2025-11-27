@@ -167,6 +167,32 @@ const CasinosPage = () => {
                     </ul>
                   </td>
                   <td style={{ padding: '1.5rem', textAlign: 'center' }}>
+                    <Link
+                      to={`/casino/${casino.id}`}
+                      data-testid={`casino-detail-btn-${casino.id}`}
+                      style={{
+                        display: 'inline-block',
+                        padding: '0.75rem 1.5rem',
+                        background: '#6b7280',
+                        color: 'white',
+                        borderRadius: '50px',
+                        fontWeight: '700',
+                        fontSize: '0.875rem',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease',
+                        whiteSpace: 'nowrap',
+                        marginBottom: '0.5rem'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.background = '#4b5563';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.background = '#6b7280';
+                      }}
+                    >
+                      VIEW DETAILS
+                    </Link>
+                    <br />
                     <a 
                       href={casino.claim_link}
                       target="_blank"
