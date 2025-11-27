@@ -75,55 +75,247 @@
     
     function initAjaxCart() {
         document.addEventListener('click', function(e) {
-            const addToCartBtn = e.target.closest('.btn-add-to-cart, .btn-add-cart-book, .btn-add-cart-fashion, .btn-primary-tech');
+            const addToCartBtn = e.target.closest('.btn-add-to-cart, .btn-add-cart-book, .btn-add-cart-fashion, .btn-primary-tech, .btn-cart-minimal');
             
             if (addToCartBtn) {
                 e.preventDefault();
+                
                 const productId = addToCartBtn.dataset.productId;
+                const variationId = addToCartBtn.dataset.variationId || null;
+                const quantity = parseInt(addToCartBtn.dataset.quantity || 1);
                 
                 // Add loading state
                 const originalHTML = addToCartBtn.innerHTML;
-                addToCartBtn.innerHTML = '<i class="bi bi-arrow-repeat animate-spin"></i> Adding...';
+                addToCartBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Adding...';
                 addToCartBtn.disabled = true;
                 
-                // Simulate AJAX call (replace with actual API call)
-                fetch('/api/cart/add', {
+                // Make AJAX call
+                fetch(CONFIG.CART_API, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
+                        action: 'add',
                         product_id: productId,
-                        quantity: 1
+                        variation_id: variationId,
+                        quantity: quantity
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // Success
-                    addToCartBtn.innerHTML = '<i class="bi bi-check"></i> Added!';
-                    addToCartBtn.classList.add('btn-success');
-                    
-                    // Update cart count
-                    updateCartCount(data.cart_count);
-                    
-                    // Show notification
-                    showNotification('Product added to cart successfully!', 'success');
-                    
-                    // Reset button after 2 seconds
-                    setTimeout(() => {
-                        addToCartBtn.innerHTML = originalHTML;
-                        addToCartBtn.disabled = false;
-                        addToCartBtn.classList.remove('btn-success');
-                    }, 2000);
+                    if (data.success) {
+                        // Success
+                        addToCartBtn.innerHTML = '<i class=\"bi bi-check\"></i> Added!';
+                        
+                        // Update cart count
+                        updateCartCount(data.cart_count);
+                        
+                        // Open mini cart
+                        openMiniCart();
+                        
+                        // Reload mini cart content
+                        loadMiniCartContent();
+                        
+                        // Show notification
+                        showNotification('Product added to cart successfully!', 'success');
+                        
+                        // Reset button after 2 seconds
+                        setTimeout(() => {
+                            addToCartBtn.innerHTML = originalHTML;
+                            addToCartBtn.disabled = false;
+                        }, 2000);
+                    } else {
+                        throw new Error(data.message || 'Failed to add to cart');
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     addToCartBtn.innerHTML = originalHTML;
                     addToCartBtn.disabled = false;
-                    showNotification('Failed to add product to cart', 'error');
+                    showNotification(error.message || 'Failed to add product to cart', 'error');
                 });
             }
         });
+    }
+    
+    // ==========================================
+    // MINI CART
+    // ==========================================
+    
+    function initMiniCart() {
+        // Close mini cart on overlay click
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('mini-cart-overlay')) {
+                closeMiniCart();
+            }
+        });
+        
+        // Handle quantity updates in mini cart
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('mini-cart-qty-btn')) {
+                e.preventDefault();
+                const cartItemId = e.target.dataset.cartItemId;
+                const action = e.target.dataset.action;
+                const qtyInput = document.querySelector(`input[data-cart-item-id="${cartItemId}"]`);
+                
+                if (qtyInput) {
+                    let newQty = parseInt(qtyInput.value);
+                    if (action === 'increase') {
+                        newQty++;
+                    } else if (action === 'decrease' && newQty > 1) {
+                        newQty--;
+                    }
+                    
+                    updateCartItemQuantity(cartItemId, newQty);
+                }
+            }
+            
+            // Remove item
+            if (e.target.closest('.mini-cart-remove-btn')) {
+                e.preventDefault();
+                const btn = e.target.closest('.mini-cart-remove-btn');
+                const cartItemId = btn.dataset.cartItemId;
+                removeCartItem(cartItemId);
+            }
+        });
+    }
+    
+    function openMiniCart() {
+        const miniCart = document.getElementById('miniCart');
+        const overlay = document.getElementById('miniCartOverlay');
+        
+        if (miniCart && overlay) {
+            miniCart.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    function closeMiniCart() {
+        const miniCart = document.getElementById('miniCart');
+        const overlay = document.getElementById('miniCartOverlay');
+        
+        if (miniCart && overlay) {
+            miniCart.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+    
+    function loadMiniCartContent() {
+        fetch(CONFIG.CART_API)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateMiniCartUI(data.items, data.total);
+                }
+            })
+            .catch(error => console.error('Error loading cart:', error));
+    }
+    
+    function updateMiniCartUI(items, total) {
+        const cartItemsContainer = document.getElementById('miniCartItems');
+        const cartTotalElement = document.getElementById('miniCartTotal');
+        
+        if (!cartItemsContainer) return;
+        
+        if (items.length === 0) {
+            cartItemsContainer.innerHTML = '<p class="text-center text-muted py-5">Your cart is empty</p>';
+            if (cartTotalElement) cartTotalElement.textContent = '$0.00';
+            return;
+        }
+        
+        let html = '';
+        items.forEach(item => {
+            const variationText = item.attributes ? 
+                Object.entries(item.attributes).map(([key, val]) => `${key}: ${val}`).join(', ') : '';
+            
+            html += `
+                <div class="mini-cart-item" data-cart-item-id="${item.id}">
+                    <img src="${item.image || '/assets/images/placeholder.jpg'}" alt="${item.name}">
+                    <div class="mini-cart-item-details">
+                        <h6>${item.name}</h6>
+                        ${variationText ? `<small class="text-muted">${variationText}</small>` : ''}
+                        <div class="mini-cart-item-price">$${parseFloat(item.price).toFixed(2)}</div>
+                        <div class="mini-cart-qty">
+                            <button class="mini-cart-qty-btn" data-cart-item-id="${item.id}" data-action="decrease">-</button>
+                            <input type="number" value="${item.quantity}" min="1" data-cart-item-id="${item.id}" readonly>
+                            <button class="mini-cart-qty-btn" data-cart-item-id="${item.id}" data-action="increase">+</button>
+                        </div>
+                    </div>
+                    <button class="mini-cart-remove-btn" data-cart-item-id="${item.id}">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            `;
+        });
+        
+        cartItemsContainer.innerHTML = html;
+        if (cartTotalElement) {
+            cartTotalElement.textContent = `$${parseFloat(total).toFixed(2)}`;
+        }
+    }
+    
+    function updateCartItemQuantity(cartItemId, quantity) {
+        fetch(CONFIG.CART_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'update',
+                cart_item_id: cartItemId,
+                quantity: quantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateCartCount(data.cart_count);
+                loadMiniCartContent();
+                showNotification('Cart updated', 'success');
+            } else {
+                throw new Error(data.message);
+            }
+        })
+        .catch(error => {
+            showNotification(error.message, 'error');
+            loadMiniCartContent(); // Reload to reset
+        });
+    }
+    
+    function removeCartItem(cartItemId) {
+        if (!confirm('Remove this item from cart?')) return;
+        
+        fetch(CONFIG.CART_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'remove',
+                cart_item_id: cartItemId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateCartCount(data.cart_count);
+                loadMiniCartContent();
+                showNotification('Item removed from cart', 'info');
+            }
+        })
+        .catch(error => {
+            showNotification('Failed to remove item', 'error');
+        });
+    }
+    
+    function loadCartCount() {
+        fetch(CONFIG.CART_API + '?action=count')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateCartCount(data.count);
+                }
+            })
+            .catch(error => console.error('Error loading cart count:', error));
     }
 
     // ==========================================
