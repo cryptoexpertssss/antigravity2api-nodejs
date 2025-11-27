@@ -144,6 +144,44 @@ const CasinoDetailPage = () => {
           </div>
         </div>
 
+        {/* Image Gallery */}
+        {casino.images && casino.images.length > 0 && (
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            padding: '2rem',
+            marginBottom: '2rem',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            border: '1px solid #e5e7eb'
+          }}>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '1.5rem' }}>Gallery</h2>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+              gap: '1rem' 
+            }}>
+              {casino.images.map((image, idx) => (
+                <img 
+                  key={idx}
+                  src={`${BACKEND_URL}${image}`}
+                  alt={`${casino.name} ${idx + 1}`}
+                  data-testid={`casino-gallery-${idx}`}
+                  style={{
+                    width: '100%',
+                    height: '200px',
+                    objectFit: 'cover',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Features */}
         <div style={{
           background: 'white',
