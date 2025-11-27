@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Navigation Preview - GamingToday</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .navbar { background: white; border-bottom: 1px solid #e5e7eb; padding: 1rem 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 28px; font-weight: 800; color: #1a1a1a; text-decoration: none; }
+        .logo span { color: #3b82f6; }
+        .nav-links { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; }
+        .nav-links a { color: #4b5563; text-decoration: none; font-weight: 600; font-size: 14px; transition: color 0.2s; white-space: nowrap; }
+        .nav-links a:hover { color: #3b82f6; }
+        .auth-buttons { display: flex; gap: 15px; align-items: center; margin-left: auto; }
+        .content { max-width: 1200px; margin: 50px auto; padding: 0 20px; }
+        .info-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .info-box h2 { color: #333; margin-bottom: 15px; }
+        .info-box p { color: #666; line-height: 1.8; }
+        .feature { display: flex; align-items: start; gap: 15px; margin: 20px 0; padding: 15px; background: #f9fafb; border-radius: 8px; }
+        .feature strong { color: #3b82f6; min-width: 100px; }
+        @media (max-width: 768px) {
+            .nav-container { flex-direction: column; gap: 15px; }
+            .nav-links { gap: 15px; justify-content: center; }
+            .auth-buttons { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation (Not Logged In State) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">Gaming<span>Today</span></a>
+            
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">Casinos</a>
+                <a href="#">Sports Betting</a>
+                <a href="#">Poker</a>
+            </div>
+            
+            <div class="auth-buttons">
+                <a href="#" style="color: #4b5563;">Login</a>
+                <a href="#" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; display: inline-block;">Sign Up</a>
+                <a href="#" style="color: #999; font-size: 12px; border-left: 1px solid #ddd; padding-left: 15px; margin-left: 10px;">Admin</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="content">
+        <div class="info-box">
+            <h2>✅ Navigation Fixed - Ab Sab Kuch Visible Hai!</h2>
+            <p>Maine navigation ko restructure kar diya hai taaki <strong>Login aur Sign Up buttons</strong> hamesha clearly visible rahe.</p>
+        </div>
+
+        <div class="info-box">
+            <h2>🎨 Kya Changes Kiye Gaye:</h2>
+            
+            <div class="feature">
+                <strong>1. Layout:</strong>
+                <span>Navigation ko 3 sections mein divide kiya: Logo | Main Links | Auth Buttons. Yeh ensure karta hai ki Login/Signup kabhi hidden na ho.</span>
+            </div>
+
+            <div class="feature">
+                <strong>2. Spacing:</strong>
+                <span>Categories ko 2 tak limit kiya taaki navigation overcrowded na ho. Baaki categories dropdown mein daal sakte hain future mein.</span>
+            </div>
+
+            <div class="feature">
+                <strong>3. Responsive:</strong>
+                <span>Mobile pe navigation vertical stack hota hai, lekin Login/Signup buttons prominently visible rehte hain.</span>
+            </div>
+
+            <div class="feature">
+                <strong>4. Visual:</strong>
+                <span>Sign Up button ko blue background diya hai taaki wo stand out kare. Login simple text link hai.</span>
+            </div>
+
+            <div class="feature">
+                <strong>5. Admin Link:</strong>
+                <span>Admin link ko subtle rakha hai with border separator - sirf admins ke liye visible hoga jab setting enabled ho.</span>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h2>📱 Mobile View:</h2>
+            <p>Mobile pe screen resize karke dekho - sab kuch stack ho jaata hai but Login/Signup clearly visible rehte hain.</p>
+        </div>
+
+        <div class="info-box" style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+            <h2>💡 User Experience:</h2>
+            <p><strong>Logged Out User:</strong> "Login" aur "Sign Up" buttons clearly dikhenge<br>
+            <strong>Logged In User:</strong> "Dashboard" aur "Logout" buttons show honge<br>
+            <strong>Admin:</strong> Ek chhota "Admin" link bhi dikhega (settings se hide kar sakte hain)</p>
+        </div>
+    </div>
+
+</body>
+</html>
