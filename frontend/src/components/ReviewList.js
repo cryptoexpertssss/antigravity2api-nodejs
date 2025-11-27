@@ -131,16 +131,16 @@ const ReviewList = ({ casinoId }) => {
                       By <strong>{review.user_name}</strong> • {formatDate(review.created_at)}
                     </div>
                   </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ color: '#fbbf24', fontSize: '1.25rem' }} data-testid={`review-rating-${review.id}`}>
-                  {'★'.repeat(Math.floor(review.rating))}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ color: '#fbbf24', fontSize: '1.25rem' }} data-testid={`review-rating-${review.id}`}>
+                      {'\u2605'.repeat(Math.floor(review.rating))}
+                    </div>
+                    <span style={{ fontWeight: '700', fontSize: '1.125rem' }}>{review.rating.toFixed(1)}</span>
+                  </div>
                 </div>
-                <span style={{ fontWeight: '700', fontSize: '1.125rem' }}>{review.rating.toFixed(1)}</span>
-              </div>
-            </div>
 
-            {/* Review Content */}
-            <p style={{ color: '#4b5563', lineHeight: '1.6', marginBottom: '1rem' }} data-testid={`review-comment-${review.id}`}>
+                {/* Review Content */}
+                <p style={{ color: '#4b5563', lineHeight: '1.6', marginBottom: '1rem' }} data-testid={`review-comment-${review.id}`}>
               {review.comment}
             </p>
 
