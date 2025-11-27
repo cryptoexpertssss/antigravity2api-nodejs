@@ -315,7 +315,7 @@ async def logout(current_user: dict = Depends(get_current_user)):
 # ========= CATEGORIES =========
 
 @api_router.post("/categories", response_model=Category)
-async def create_category(input: CategoryCreate):
+async def create_category(input: CategoryCreate, current_user: dict = Depends(admin_required)):
     category = Category(**input.model_dump())
     doc = category.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
