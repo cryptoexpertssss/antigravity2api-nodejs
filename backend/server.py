@@ -82,6 +82,7 @@ class CasinoListing(BaseModel):
     name: str
     rank: int
     logo_url: str
+    images: List[str] = []
     offer_title: str
     offer_details: str
     features: List[str]
@@ -96,6 +97,7 @@ class CasinoListingCreate(BaseModel):
     name: str
     rank: int
     logo_url: str
+    images: List[str] = []
     offer_title: str
     offer_details: str
     features: List[str]
