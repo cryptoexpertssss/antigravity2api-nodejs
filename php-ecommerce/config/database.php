@@ -5,7 +5,7 @@
  */
 
 return [
-    'host' => 'localhost',
+    'host' => '127.0.0.1',
     'database' => 'woodmart_clone',
     'username' => 'root',
     'password' => '',
