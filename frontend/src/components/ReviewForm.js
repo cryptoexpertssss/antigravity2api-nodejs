@@ -9,6 +9,7 @@ const API = `${BACKEND_URL}/api`;
 const ReviewForm = ({ casinoId, casinoName, onClose }) => {
   const [formData, setFormData] = useState({
     user_name: "",
+    user_avatar: "",
     rating: 5,
     title: "",
     comment: "",
@@ -16,6 +17,7 @@ const ReviewForm = ({ casinoId, casinoName, onClose }) => {
     cons: [""]
   });
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
