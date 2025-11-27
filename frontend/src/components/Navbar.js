@@ -164,7 +164,9 @@ const Navbar = ({ categories = [] }) => {
                 {cat.name}
               </Link>
             ))}
-            <Link to="/admin" className="btn btn-primary" style={{ marginTop: '0.5rem' }}>Admin</Link>
+            <Link to="/login" style={{ padding: '0.5rem', fontWeight: '600', color: '#4b5563' }}>Login</Link>
+            <Link to="/register" className="btn btn-primary" style={{ marginTop: '0.5rem' }}>Sign Up</Link>
+            <Link to="/admin" style={{ padding: '0.5rem', fontWeight: '600', color: '#9ca3af', fontSize: '0.875rem' }}>Admin</Link>
           </div>
         </div>
       )}
