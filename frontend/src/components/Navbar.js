@@ -67,7 +67,7 @@ const Navbar = ({ categories = [] }) => {
           >
             Casino Rankings
           </Link>
-          {categories.slice(0, 3).map((cat) => (
+          {categories.slice(0, 2).map((cat) => (
             <Link 
               key={cat.id}
               to={`/category/${cat.id}`}
@@ -85,12 +85,46 @@ const Navbar = ({ categories = [] }) => {
             </Link>
           ))}
           <Link 
+            to="/login" 
+            data-testid="nav-login"
+            style={{
+              fontWeight: '600',
+              fontSize: '0.95rem',
+              color: '#4b5563',
+              transition: 'color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.color = '#2563eb'}
+            onMouseLeave={(e) => e.target.style.color = '#4b5563'}
+          >
+            Login
+          </Link>
+          <Link 
+            to="/register" 
+            data-testid="nav-register"
+            style={{
+              padding: '0.6rem 1.5rem',
+              fontSize: '0.875rem',
+              background: '#2563eb',
+              color: 'white',
+              borderRadius: '8px',
+              fontWeight: '600',
+              transition: 'background 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.background = '#1d4ed8'}
+            onMouseLeave={(e) => e.target.style.background = '#2563eb'}
+          >
+            Sign Up
+          </Link>
+          <Link 
             to="/admin" 
             data-testid="nav-admin"
-            className="btn btn-primary"
             style={{
               padding: '0.5rem 1.25rem',
-              fontSize: '0.875rem'
+              fontSize: '0.75rem',
+              color: '#9ca3af',
+              border: '1px solid #e5e7eb',
+              borderRadius: '6px',
+              fontWeight: '500'
             }}
           >
             Admin
