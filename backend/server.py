@@ -105,6 +105,72 @@ class CasinoListingCreate(BaseModel):
     rating: float = 5.0
     is_featured: bool = False
 
+class UserReview(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    casino_id: str
+    user_name: str
+    rating: float
+    title: str
+    comment: str
+    pros: List[str] = []
+    cons: List[str] = []
+    is_verified: bool = False
+    status: str = "pending"  # pending, approved, rejected
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class UserReviewCreate(BaseModel):
+    casino_id: str
+    user_name: str
+    rating: float
+    title: str
+    comment: str
+    pros: List[str] = []
+    cons: List[str] = []
+
+class AffiliateLink(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    casino_id: Optional[str] = None
+    url: str
+    description: Optional[str] = None
+    clicks: int = 0
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class AffiliateLinkCreate(BaseModel):
+    name: str
+    casino_id: Optional[str] = None
+    url: str
+    description: Optional[str] = None
+    is_active: bool = True
+
+class Advertisement(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    position: str  # header, sidebar, footer, in-content
+    image_url: str
+    link_url: str
+    alt_text: str
+    is_active: bool = True
+    impressions: int = 0
+    clicks: int = 0
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class AdvertisementCreate(BaseModel):
+    name: str
+    position: str
+    image_url: str
+    link_url: str
+    alt_text: str
+    is_active: bool = True
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+
 # ============ ROUTES ============
 
 @api_router.get("/")
