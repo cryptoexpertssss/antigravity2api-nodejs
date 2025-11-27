@@ -340,7 +340,7 @@ async def get_category(category_id: str):
     return category
 
 @api_router.put("/categories/{category_id}", response_model=Category)
-async def update_category(category_id: str, input: CategoryCreate):
+async def update_category(category_id: str, input: CategoryCreate, current_user: dict = Depends(admin_required)):
     existing = await db.categories.find_one({"id": category_id})
     if not existing:
         raise HTTPException(status_code=404, detail="Category not found")
@@ -354,7 +354,7 @@ async def update_category(category_id: str, input: CategoryCreate):
     return Category(**updated)
 
 @api_router.delete("/categories/{category_id}")
-async def delete_category(category_id: str):
+async def delete_category(category_id: str, current_user: dict = Depends(admin_required)):
     result = await db.categories.delete_one({"id": category_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Category not found")
@@ -363,7 +363,7 @@ async def delete_category(category_id: str):
 # ========= ARTICLES =========
 
 @api_router.post("/articles", response_model=Article)
-async def create_article(input: ArticleCreate):
+async def create_article(input: ArticleCreate, current_user: dict = Depends(admin_required)):
     article = Article(**input.model_dump())
     doc = article.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -410,7 +410,7 @@ async def get_article_by_slug(slug: str):
     return article
 
 @api_router.put("/articles/{article_id}", response_model=Article)
-async def update_article(article_id: str, input: ArticleCreate):
+async def update_article(article_id: str, input: ArticleCreate, current_user: dict = Depends(admin_required)):
     existing = await db.articles.find_one({"id": article_id})
     if not existing:
         raise HTTPException(status_code=404, detail="Article not found")
@@ -427,7 +427,7 @@ async def update_article(article_id: str, input: ArticleCreate):
     return Article(**updated)
 
 @api_router.delete("/articles/{article_id}")
-async def delete_article(article_id: str):
+async def delete_article(article_id: str, current_user: dict = Depends(admin_required)):
     result = await db.articles.delete_one({"id": article_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Article not found")
@@ -436,7 +436,7 @@ async def delete_article(article_id: str):
 # ========= CASINO LISTINGS =========
 
 @api_router.post("/casinos", response_model=CasinoListing)
-async def create_casino(input: CasinoListingCreate):
+async def create_casino(input: CasinoListingCreate, current_user: dict = Depends(admin_required)):
     casino = CasinoListing(**input.model_dump())
     doc = casino.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -465,7 +465,7 @@ async def get_casino(casino_id: str):
     return casino
 
 @api_router.put("/casinos/{casino_id}", response_model=CasinoListing)
-async def update_casino(casino_id: str, input: CasinoListingCreate):
+async def update_casino(casino_id: str, input: CasinoListingCreate, current_user: dict = Depends(admin_required)):
     existing = await db.casinos.find_one({"id": casino_id})
     if not existing:
         raise HTTPException(status_code=404, detail="Casino not found")
@@ -479,7 +479,7 @@ async def update_casino(casino_id: str, input: CasinoListingCreate):
     return CasinoListing(**updated)
 
 @api_router.delete("/casinos/{casino_id}")
-async def delete_casino(casino_id: str):
+async def delete_casino(casino_id: str, current_user: dict = Depends(admin_required)):
     result = await db.casinos.delete_one({"id": casino_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Casino not found")
@@ -556,7 +556,7 @@ async def get_review(review_id: str):
     return review
 
 @api_router.put("/reviews/{review_id}/status")
-async def update_review_status(review_id: str, status: str):
+async def update_review_status(review_id: str, status: str, current_user: dict = Depends(admin_required)):
     if status not in ["pending", "approved", "rejected"]:
         raise HTTPException(status_code=400, detail="Invalid status")
     
@@ -569,7 +569,7 @@ async def update_review_status(review_id: str, status: str):
     return {"message": "Review status updated successfully"}
 
 @api_router.delete("/reviews/{review_id}")
-async def delete_review(review_id: str):
+async def delete_review(review_id: str, current_user: dict = Depends(admin_required)):
     result = await db.reviews.delete_one({"id": review_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Review not found")
@@ -578,7 +578,7 @@ async def delete_review(review_id: str):
 # ========= AFFILIATE LINKS =========
 
 @api_router.post("/affiliate-links", response_model=AffiliateLink)
-async def create_affiliate_link(input: AffiliateLinkCreate):
+async def create_affiliate_link(input: AffiliateLinkCreate, current_user: dict = Depends(admin_required)):
     link = AffiliateLink(**input.model_dump())
     doc = link.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -617,7 +617,7 @@ async def track_affiliate_click(link_id: str):
     return {"message": "Click tracked successfully"}
 
 @api_router.put("/affiliate-links/{link_id}", response_model=AffiliateLink)
-async def update_affiliate_link(link_id: str, input: AffiliateLinkCreate):
+async def update_affiliate_link(link_id: str, input: AffiliateLinkCreate, current_user: dict = Depends(admin_required)):
     existing = await db.affiliate_links.find_one({"id": link_id})
     if not existing:
         raise HTTPException(status_code=404, detail="Affiliate link not found")
@@ -631,7 +631,7 @@ async def update_affiliate_link(link_id: str, input: AffiliateLinkCreate):
     return AffiliateLink(**updated)
 
 @api_router.delete("/affiliate-links/{link_id}")
-async def delete_affiliate_link(link_id: str):
+async def delete_affiliate_link(link_id: str, current_user: dict = Depends(admin_required)):
     result = await db.affiliate_links.delete_one({"id": link_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Affiliate link not found")
@@ -640,7 +640,7 @@ async def delete_affiliate_link(link_id: str):
 # ========= ADVERTISEMENTS =========
 
 @api_router.post("/ads", response_model=Advertisement)
-async def create_ad(input: AdvertisementCreate):
+async def create_ad(input: AdvertisementCreate, current_user: dict = Depends(admin_required)):
     ad = Advertisement(**input.model_dump())
     doc = ad.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -694,7 +694,7 @@ async def track_ad_click(ad_id: str):
     return {"message": "Click tracked"}
 
 @api_router.put("/ads/{ad_id}", response_model=Advertisement)
-async def update_ad(ad_id: str, input: AdvertisementCreate):
+async def update_ad(ad_id: str, input: AdvertisementCreate, current_user: dict = Depends(admin_required)):
     existing = await db.advertisements.find_one({"id": ad_id})
     if not existing:
         raise HTTPException(status_code=404, detail="Advertisement not found")
@@ -717,7 +717,7 @@ async def update_ad(ad_id: str, input: AdvertisementCreate):
     return Advertisement(**updated)
 
 @api_router.delete("/ads/{ad_id}")
-async def delete_ad(ad_id: str):
+async def delete_ad(ad_id: str, current_user: dict = Depends(admin_required)):
     result = await db.advertisements.delete_one({"id": ad_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Advertisement not found")
