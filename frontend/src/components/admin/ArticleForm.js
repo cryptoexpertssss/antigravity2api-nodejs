@@ -32,8 +32,50 @@ const ArticleForm = ({ article, categories, onClose }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleContentChange = (value) => {
-    setFormData(prev => ({ ...prev, content: value }));
+  const handleContentChange = (e) => {
+    setFormData(prev => ({ ...prev, content: e.target.value }));
+  };
+
+  const insertFormatting = (tag) => {
+    const textarea = document.getElementById('article-content');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = formData.content.substring(start, end);
+    const before = formData.content.substring(0, start);
+    const after = formData.content.substring(end);
+    
+    let formatted = '';
+    switch(tag) {
+      case 'h1':
+        formatted = `${before}<h1>${selectedText}</h1>${after}`;
+        break;
+      case 'h2':
+        formatted = `${before}<h2>${selectedText}</h2>${after}`;
+        break;
+      case 'h3':
+        formatted = `${before}<h3>${selectedText}</h3>${after}`;
+        break;
+      case 'bold':
+        formatted = `${before}<strong>${selectedText}</strong>${after}`;
+        break;
+      case 'italic':
+        formatted = `${before}<em>${selectedText}</em>${after}`;
+        break;
+      case 'p':
+        formatted = `${before}<p>${selectedText}</p>${after}`;
+        break;
+      case 'ul':
+        formatted = `${before}<ul><li>${selectedText}</li></ul>${after}`;
+        break;
+      case 'link':
+        const url = prompt('Enter URL:');
+        if (url) formatted = `${before}<a href="${url}">${selectedText}</a>${after}`;
+        else formatted = formData.content;
+        break;
+      default:
+        formatted = formData.content;
+    }
+    setFormData(prev => ({ ...prev, content: formatted }));
   };
 
   const handleImageUpload = async (e) => {
