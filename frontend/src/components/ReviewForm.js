@@ -79,6 +79,7 @@ const ReviewForm = ({ casinoId, casinoName, onClose }) => {
     const reviewData = {
       casino_id: casinoId,
       user_name: formData.user_name,
+      user_avatar: formData.user_avatar || null,
       rating: parseFloat(formData.rating),
       title: formData.title,
       comment: formData.comment,
