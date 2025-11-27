@@ -9,8 +9,11 @@ const AdminLayout = ({ children }) => {
   const menuItems = [
     { path: '/admin', label: 'Dashboard', icon: '📋' },
     { path: '/admin/articles', label: 'Articles', icon: '📝' },
-    { path: '/admin/categories', label: 'Categories', icon: '📋' },
-    { path: '/admin/casinos', label: 'Casinos', icon: '🎰' }
+    { path: '/admin/categories', label: 'Categories', icon: '📂' },
+    { path: '/admin/casinos', label: 'Casinos', icon: '🎰' },
+    { path: '/admin/reviews', label: 'Reviews', icon: '⭐' },
+    { path: '/admin/affiliate-links', label: 'Affiliate Links', icon: '🔗' },
+    { path: '/admin/ads', label: 'Advertisements', icon: '📢' }
   ];
 
   return (
