@@ -19,6 +19,21 @@ async def seed_data():
     await db.categories.delete_many({})
     await db.articles.delete_many({})
     await db.casinos.delete_many({})
+    await db.users.delete_many({})
+    
+    # Create default admin user
+    admin_user = {
+        "id": str(uuid.uuid4()),
+        "username": "admin",
+        "email": "admin@gamingtoday.com",
+        "full_name": "Administrator",
+        "hashed_password": get_password_hash("admin123"),
+        "role": "admin",
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_one(admin_user)
+    print(f"✓ Created default admin user (username: admin, password: admin123)")
     
     # Seed Categories
     categories = [
