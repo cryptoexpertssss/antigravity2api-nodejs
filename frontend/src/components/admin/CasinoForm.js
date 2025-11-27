@@ -53,6 +53,33 @@ const CasinoForm = ({ casino, onClose }) => {
     }));
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formDataObj = new FormData();
+    formDataObj.append('file', file);
+
+    setUploadingImage(true);
+    try {
+      const response = await axios.post(`${API}/upload`, formDataObj);
+      setFormData(prev => ({ ...prev, images: [...prev.images, response.data.url] }));
+      toast.success("Image uploaded successfully");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast.error("Failed to upload image");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const removeImage = (index) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      images: prev.images.filter((_, i) => i !== index) 
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
