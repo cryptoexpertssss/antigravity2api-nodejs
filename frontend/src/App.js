@@ -37,6 +37,7 @@ function App() {
           <Route path="/casinos" element={<CasinosPage />} />
           <Route path="/casino/:casinoId" element={<CasinoDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<LoginPage />} />
           
           {/* Protected Admin Routes */}
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
