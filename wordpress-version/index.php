@@ -91,15 +91,35 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
             </div>
             
             <div class="auth-buttons">
-                <?php if (isUserLoggedIn()): ?>
-                    <a href="user-dashboard.php">Dashboard</a>
+                <?php 
+                // Check if user is logged in
+                $user_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+                
+                if ($user_logged_in): 
+                ?>
+                    <a href="user-dashboard.php" style="color: #4b5563;">Dashboard</a>
                     <a href="user-logout.php" style="color: #dc2626;">Logout</a>
                 <?php else: ?>
-                    <a href="user-login.php" style="color: #4b5563;">Login</a>
-                    <a href="register.php" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; display: inline-block;">Sign Up</a>
+                    <a href="user-login.php" style="color: #4b5563; font-weight: 600;">Login</a>
+                    <a href="register.php" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; display: inline-block; font-weight: 600; text-decoration: none;">Sign Up</a>
                 <?php endif; ?>
                 
-                <?php if (shouldShowAdminLink()): ?>
+                <?php 
+                // Check if admin link should be shown
+                $show_admin = true; // Default show
+                try {
+                    if (isset($pdo)) {
+                        $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = 'hide_admin_link'");
+                        $stmt->execute();
+                        $value = $stmt->fetchColumn();
+                        $show_admin = ($value !== '1');
+                    }
+                } catch (Exception $e) {
+                    $show_admin = true;
+                }
+                
+                if ($show_admin): 
+                ?>
                     <a href="login.php" style="color: #999; font-size: 12px; border-left: 1px solid #ddd; padding-left: 15px; margin-left: 10px;">Admin</a>
                 <?php endif; ?>
             </div>
