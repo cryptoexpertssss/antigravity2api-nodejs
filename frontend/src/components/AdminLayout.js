@@ -27,6 +27,19 @@ const AdminLayout = ({ children }) => {
             Gaming<span style={{ color: '#3b82f6' }}>Today</span>
           </h2>
           <p style={{ fontSize: '0.875rem', color: '#9ca3af', marginTop: '0.5rem' }}>Admin Panel</p>
+          {user && (
+            <div style={{ 
+              marginTop: '1rem', 
+              padding: '0.75rem', 
+              background: 'rgba(255,255,255,0.1)', 
+              borderRadius: '8px',
+              fontSize: '0.875rem'
+            }}>
+              <div style={{ color: '#d1d5db', marginBottom: '0.25rem' }}>Logged in as:</div>
+              <div style={{ color: 'white', fontWeight: '600' }}>{user.full_name}</div>
+              <div style={{ color: '#9ca3af', fontSize: '0.75rem' }}>@{user.username}</div>
+            </div>
+          )}
         </div>
 
         <nav>
