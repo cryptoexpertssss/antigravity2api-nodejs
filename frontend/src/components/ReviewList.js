@@ -146,35 +146,35 @@ const ReviewList = ({ casinoId }) => {
 
                 {/* Pros & Cons */}
                 {(review.pros.length > 0 || review.cons.length > 0) && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                {review.pros.length > 0 && (
-                  <div>
-                    <div style={{ fontWeight: '600', color: '#059669', marginBottom: '0.5rem' }}>Pros:</div>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                      {review.pros.map((pro, idx) => (
-                        <li key={idx} style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '0.25rem', paddingLeft: '1.25rem', position: 'relative' }}>
-                          <span style={{ position: 'absolute', left: 0, color: '#10b981' }}>✓</span>
-                          {pro}
-                        </li>
-                      ))}
-                    </ul>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    {review.pros.length > 0 && (
+                      <div>
+                        <div style={{ fontWeight: '600', color: '#059669', marginBottom: '0.5rem' }}>Pros:</div>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                          {review.pros.map((pro, idx) => (
+                            <li key={idx} style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '0.25rem', paddingLeft: '1.25rem', position: 'relative' }}>
+                              <span style={{ position: 'absolute', left: 0, color: '#10b981' }}>✓</span>
+                              {pro}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {review.cons.length > 0 && (
+                      <div>
+                        <div style={{ fontWeight: '600', color: '#dc2626', marginBottom: '0.5rem' }}>Cons:</div>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                          {review.cons.map((con, idx) => (
+                            <li key={idx} style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '0.25rem', paddingLeft: '1.25rem', position: 'relative' }}>
+                              <span style={{ position: 'absolute', left: 0, color: '#ef4444' }}>✗</span>
+                              {con}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
-                {review.cons.length > 0 && (
-                  <div>
-                    <div style={{ fontWeight: '600', color: '#dc2626', marginBottom: '0.5rem' }}>Cons:</div>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                      {review.cons.map((con, idx) => (
-                        <li key={idx} style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '0.25rem', paddingLeft: '1.25rem', position: 'relative' }}>
-                          <span style={{ position: 'absolute', left: 0, color: '#ef4444' }}>✗</span>
-                          {con}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         ))}
       </div>
