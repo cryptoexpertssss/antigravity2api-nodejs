@@ -62,7 +62,18 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
                 <?php foreach(array_slice($categories, 0, 3) as $cat): ?>
                     <a href="category.php?id=<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></a>
                 <?php endforeach; ?>
-                <a href="login.php">Admin</a>
+                
+                <?php if (isUserLoggedIn()): ?>
+                    <a href="user-dashboard.php">My Dashboard</a>
+                    <a href="user-logout.php" style="color: #dc2626;">Logout</a>
+                <?php else: ?>
+                    <a href="user-login.php">Login</a>
+                    <a href="register.php" style="background: #3b82f6; color: white; padding: 8px 16px; border-radius: 8px;">Sign Up</a>
+                <?php endif; ?>
+                
+                <?php if (shouldShowAdminLink()): ?>
+                    <a href="login.php" style="color: #666; font-size: 12px;">Admin</a>
+                <?php endif; ?>
             </div>
         </div>
     </nav>
