@@ -141,8 +141,8 @@ const ReviewList = ({ casinoId }) => {
 
                 {/* Review Content */}
                 <p style={{ color: '#4b5563', lineHeight: '1.6', marginBottom: '1rem' }} data-testid={`review-comment-${review.id}`}>
-              {review.comment}
-            </p>
+                  {review.comment}
+                </p>
 
             {/* Pros & Cons */}
             {(review.pros.length > 0 || review.cons.length > 0) && (
