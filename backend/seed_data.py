@@ -3,6 +3,9 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from datetime import datetime, timezone
 import uuid
+import sys
+sys.path.append(os.path.dirname(__file__))
+from auth import get_password_hash
 
 # MongoDB connection
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
