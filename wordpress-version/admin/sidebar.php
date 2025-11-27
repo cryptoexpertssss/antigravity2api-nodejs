@@ -9,6 +9,7 @@
         <li><a href="reviews.php" class="<?= basename($_SERVER['PHP_SELF']) == 'reviews.php' ? 'active' : '' ?>">⭐ Reviews</a></li>
         <li><a href="affiliate.php" class="<?= basename($_SERVER['PHP_SELF']) == 'affiliate.php' ? 'active' : '' ?>">🔗 Affiliate Links</a></li>
         <li><a href="ads.php" class="<?= basename($_SERVER['PHP_SELF']) == 'ads.php' ? 'active' : '' ?>">📢 Advertisements</a></li>
+        <li><a href="settings.php" class="<?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>">⚙️ Settings</a></li>
     </ul>
     
     <form method="POST" action="logout.php" style="margin-top: 30px;">
