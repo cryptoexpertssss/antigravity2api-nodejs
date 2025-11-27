@@ -386,11 +386,271 @@
     }
 
     // ==========================================
-    // SEARCH & FILTERS
+    // AJAX FILTERS (SIDEBAR)
+    // ==========================================
+    
+    function initAjaxFilters() {
+        const filterForm = document.getElementById('productFilters');
+        if (!filterForm) return;
+        
+        // Price range filter
+        const priceInputs = filterForm.querySelectorAll('input[name="price_range"]');
+        priceInputs.forEach(input => {
+            input.addEventListener('change', () => applyFilters());
+        });
+        
+        // Category filter
+        const categoryInputs = filterForm.querySelectorAll('input[name="category"]');
+        categoryInputs.forEach(input => {
+            input.addEventListener('change', () => applyFilters());
+        });
+        
+        // Color filter
+        const colorInputs = filterForm.querySelectorAll('input[name="color"]');
+        colorInputs.forEach(input => {
+            input.addEventListener('change', () => applyFilters());
+        });
+        
+        // Brand filter
+        const brandInputs = filterForm.querySelectorAll('input[name="brand"]');
+        brandInputs.forEach(input => {
+            input.addEventListener('change', () => applyFilters());
+        });
+        
+        // Sort by
+        const sortSelect = document.getElementById('sortBy');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', () => applyFilters());
+        }
+    }
+    
+    function applyFilters() {
+        const filterForm = document.getElementById('productFilters');
+        if (!filterForm) return;
+        
+        // Collect filter values
+        const filters = {};
+        
+        // Price range
+        const selectedPrice = filterForm.querySelector('input[name=\"price_range\"]:checked');
+        if (selectedPrice) {
+            const [min, max] = selectedPrice.value.split('-');
+            if (min) filters.min_price = min;
+            if (max) filters.max_price = max;
+        }
+        
+        // Categories
+        const selectedCategories = Array.from(filterForm.querySelectorAll('input[name=\"category\"]:checked'))
+            .map(input => input.value);
+        if (selectedCategories.length > 0) {
+            filters.category_id = selectedCategories[0]; // Single category for now
+        }
+        
+        // Colors
+        const selectedColors = Array.from(filterForm.querySelectorAll('input[name=\"color\"]:checked'))
+            .map(input => input.value);
+        if (selectedColors.length > 0) {
+            filters.color = selectedColors.join(',');
+        }
+        
+        // Brands
+        const selectedBrands = Array.from(filterForm.querySelectorAll('input[name=\"brand\"]:checked'))
+            .map(input => input.value);
+        if (selectedBrands.length > 0) {
+            filters.brand = selectedBrands.join(',');
+        }
+        
+        // Sort
+        const sortSelect = document.getElementById('sortBy');
+        if (sortSelect && sortSelect.value) {
+            filters.order_by = sortSelect.value;\n        }
+        
+        // Build query string
+        const queryString = new URLSearchParams(filters).toString();
+        
+        // Show loading
+        const productGrid = document.getElementById('productGrid');
+        if (productGrid) {
+            productGrid.innerHTML = '<div class=\"text-center py-5\"><div class=\"loading-spinner\"></div><p>Loading products...</p></div>';
+        }
+        
+        // Fetch filtered products
+        fetch(`${CONFIG.PRODUCTS_API}?${queryString}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateProductGrid(data.data);
+                    updateProductCount(data.total);
+                } else {
+                    throw new Error(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Filter error:', error);
+                showNotification('Failed to load products', 'error');
+            });
+    }
+    
+    function updateProductGrid(products) {
+        const productGrid = document.getElementById('productGrid');
+        if (!productGrid) return;
+        
+        if (products.length === 0) {
+            productGrid.innerHTML = '<div class=\"col-12\"><p class=\"text-center py-5\">No products found matching your criteria.</p></div>';
+            return;
+        }
+        
+        let html = '';
+        products.forEach(product => {
+            html += generateProductCardHTML(product);
+        });
+        
+        productGrid.innerHTML = html;
+    }
+    
+    function generateProductCardHTML(product) {
+        // This should match your card-v1.php structure
+        return `
+            <div class=\"col\">
+                <div class=\"product-card card-v1\" data-product-id=\"${product.id}\">
+                    <div class=\"card-image-wrapper\">
+                        ${product.is_on_sale ? '<span class=\"badge-sale\">SALE</span>' : ''}
+                        <a href=\"/product/${product.slug}\">
+                            <img src=\"${product.image || '/assets/images/placeholder.jpg'}\" 
+                                 alt=\"${product.name}\" class=\"product-image\" loading=\"lazy\">
+                        </a>
+                    </div>
+                    <div class=\"card-body-v1\">
+                        <h3 class=\"product-title\">
+                            <a href=\"/product/${product.slug}\">${product.name}</a>
+                        </h3>
+                        <div class=\"product-price\">
+                            ${product.compare_price > product.price ? 
+                                `<span class=\"price-old\">$${parseFloat(product.compare_price).toFixed(2)}</span>` : ''}
+                            <span class=\"price-current\">$${parseFloat(product.price).toFixed(2)}</span>
+                        </div>
+                        <button class=\"btn-add-to-cart\" data-product-id=\"${product.id}\">
+                            <i class=\"bi bi-cart-plus\"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function updateProductCount(count) {
+        const countElement = document.getElementById('productCount');
+        if (countElement) {
+            countElement.textContent = `${count} products found`;
+        }
+    }
+    
+    // ==========================================
+    // PRODUCT VARIATIONS (COLOR/SIZE SWATCHES)
+    // ==========================================
+    
+    function initProductVariations() {
+        // Color swatch handling
+        document.addEventListener('click', function(e) {
+            const colorSwatch = e.target.closest('.color-swatch');
+            if (colorSwatch) {
+                e.preventDefault();
+                handleColorChange(colorSwatch);
+            }
+            
+            const sizeSwatch = e.target.closest('.size-swatch');
+            if (sizeSwatch) {
+                e.preventDefault();
+                handleSizeChange(sizeSwatch);
+            }
+        });
+    }
+    
+    function handleColorChange(swatch) {
+        // Remove active from siblings
+        const container = swatch.closest('.color-swatches');
+        container.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        
+        // Add active to clicked
+        swatch.classList.add('active');
+        
+        // Get variation data
+        const variationId = swatch.dataset.variationId;
+        const price = swatch.dataset.price;
+        const stock = swatch.dataset.stock;
+        const image = swatch.dataset.image;
+        
+        // Update product image
+        if (image) {
+            const mainImage = document.getElementById('productMainImage');
+            if (mainImage) {
+                mainImage.src = image;
+            }
+        }
+        
+        // Update price
+        if (price) {
+            const priceElement = document.getElementById('productPrice');
+            if (priceElement) {
+                priceElement.textContent = `$${parseFloat(price).toFixed(2)}`;
+            }
+        }
+        
+        // Update stock
+        if (stock) {
+            const stockElement = document.getElementById('productStock');
+            if (stockElement) {
+                stockElement.textContent = `${stock} in stock`;
+                stockElement.className = parseInt(stock) > 0 ? 'text-success' : 'text-danger';
+            }
+        }
+        
+        // Update variation ID for add to cart
+        const addToCartBtn = document.querySelector('[data-product-add-to-cart]');
+        if (addToCartBtn && variationId) {
+            addToCartBtn.dataset.variationId = variationId;
+        }
+    }
+    
+    function handleSizeChange(swatch) {
+        // Remove active from siblings
+        const container = swatch.closest('.size-swatches');
+        container.querySelectorAll('.size-swatch').forEach(s => s.classList.remove('active'));
+        
+        // Add active to clicked
+        swatch.classList.add('active');
+        
+        // Similar to handleColorChange, update price/stock if needed
+        const variationId = swatch.dataset.variationId;
+        const price = swatch.dataset.price;
+        const stock = swatch.dataset.stock;
+        
+        if (price) {
+            const priceElement = document.getElementById('productPrice');
+            if (priceElement) {
+                priceElement.textContent = `$${parseFloat(price).toFixed(2)}`;
+            }
+        }
+        
+        if (stock) {
+            const stockElement = document.getElementById('productStock');
+            if (stockElement) {
+                stockElement.textContent = `${stock} in stock`;
+            }
+        }
+        
+        const addToCartBtn = document.querySelector('[data-product-add-to-cart]');
+        if (addToCartBtn && variationId) {
+            addToCartBtn.dataset.variationId = variationId;
+        }
+    }
+    
+    // ==========================================
+    // SEARCH & AUTOCOMPLETE
     // ==========================================
     
     function initSearchFilters() {
-        const searchInput = document.querySelector('input[type="search"]');
+        const searchInput = document.querySelector('input[type=\"search\"][name=\"q\"]');
         
         if (searchInput) {
             let searchTimeout;
@@ -403,18 +663,51 @@
                     if (query.length >= 3) {
                         performSearch(query);
                     }
-                }, 300);
+                }, CONFIG.DEBOUNCE_DELAY);
             });
         }
     }
     
     function performSearch(query) {
-        console.log('Searching for:', query);
+        fetch(`${CONFIG.PRODUCTS_API}?search=${encodeURIComponent(query)}&limit=5`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displaySearchResults(data.data);
+                }
+            })
+            .catch(error => console.error('Search error:', error));
+    }
+    
+    function displaySearchResults(results) {
+        const resultsContainer = document.getElementById('searchResults');
+        if (!resultsContainer) return;
         
-        // Implement live search functionality
-        // fetch(`/api/search?q=${encodeURIComponent(query)}`)
-        //     .then(response => response.json())
-        //     .then(data => displaySearchResults(data));
+        if (results.length === 0) {
+            resultsContainer.innerHTML = '<p class=\"p-3\">No results found</p>';
+            resultsContainer.classList.add('show');
+            return;
+        }
+        
+        let html = '<div class=\"list-group\">';
+        results.forEach(product => {
+            html += `
+                <a href=\"/product/${product.slug}\" class=\"list-group-item list-group-item-action\">
+                    <div class=\"d-flex gap-3\">
+                        <img src=\"${product.image || '/assets/images/placeholder.jpg'}\" 
+                             alt=\"${product.name}\" style=\"width: 50px; height: 50px; object-fit: cover;\">
+                        <div>
+                            <h6 class=\"mb-0\">${product.name}</h6>
+                            <small class=\"text-muted\">$${parseFloat(product.price).toFixed(2)}</small>
+                        </div>
+                    </div>
+                </a>
+            `;
+        });
+        html += '</div>';
+        
+        resultsContainer.innerHTML = html;
+        resultsContainer.classList.add('show');
     }
 
     // ==========================================
