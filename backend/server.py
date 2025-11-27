@@ -214,6 +214,104 @@ class AdvertisementCreate(BaseModel):
 async def root():
     return {"message": "Gaming Today API"}
 
+# ========= AUTHENTICATION =========
+
+@api_router.post("/auth/register", response_model=Token)
+async def register(user_input: UserCreate):
+    # Check if username already exists
+    existing_user = await db.users.find_one({"username": user_input.username})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    
+    # Check if email already exists
+    existing_email = await db.users.find_one({"email": user_input.email})
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create new user
+    hashed_password = get_password_hash(user_input.password)
+    user = User(
+        username=user_input.username,
+        email=user_input.email,
+        full_name=user_input.full_name,
+        hashed_password=hashed_password,
+        role="admin"  # First user is admin
+    )
+    
+    doc = user.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.users.insert_one(doc)
+    
+    # Create access token
+    access_token = create_access_token(
+        data={"sub": user.username, "role": user.role, "id": user.id}
+    )
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "full_name": user.full_name,
+            "role": user.role
+        }
+    }
+
+@api_router.post("/auth/login", response_model=Token)
+async def login(login_data: UserLogin):
+    # Find user
+    user = await db.users.find_one({"username": login_data.username})
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password"
+        )
+    
+    # Verify password
+    if not verify_password(login_data.password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password"
+        )
+    
+    # Check if user is active
+    if not user.get("is_active", True):
+        raise HTTPException(
+            status_code=401,
+            detail="User account is disabled"
+        )
+    
+    # Create access token
+    access_token = create_access_token(
+        data={"sub": user["username"], "role": user["role"], "id": user["id"]}
+    )
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "email": user["email"],
+            "full_name": user["full_name"],
+            "role": user["role"]
+        }
+    }
+
+@api_router.get("/auth/me")
+async def get_current_user_info(current_user: dict = Depends(get_current_user)):
+    user = await db.users.find_one({"username": current_user["sub"]}, {"_id": 0, "hashed_password": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+@api_router.post("/auth/logout")
+async def logout(current_user: dict = Depends(get_current_user)):
+    # In JWT, logout is handled client-side by removing the token
+    return {"message": "Logged out successfully"}
+
 # ========= CATEGORIES =========
 
 @api_router.post("/categories", response_model=Category)
