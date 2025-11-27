@@ -67,6 +67,9 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         .slider-arrow.prev { left: 20px; }
         .slider-arrow.next { right: 20px; }
         @media (max-width: 768px) {
+            .nav-container { flex-direction: column; gap: 15px; }
+            .nav-links { gap: 15px; justify-content: center; }
+            .auth-buttons { margin-left: 0; }
             .slide { height: 400px; }
             .slide-content h2 { font-size: 32px; }
             .slide-content p { font-size: 16px; }
