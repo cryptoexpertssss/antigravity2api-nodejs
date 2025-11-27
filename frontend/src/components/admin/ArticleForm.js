@@ -273,21 +273,48 @@ const ArticleForm = ({ article, categories, onClose }) => {
 
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Content *</label>
-            <ReactQuill 
+            
+            {/* Simple HTML Editor Toolbar */}
+            <div style={{ 
+              display: 'flex', 
+              gap: '0.5rem', 
+              marginBottom: '0.5rem',
+              padding: '0.5rem',
+              background: '#f9fafb',
+              borderRadius: '8px',
+              flexWrap: 'wrap'
+            }}>
+              <button type="button" onClick={() => insertFormatting('h1')} style={{ padding: '0.5rem', background: 'white', border: '1px solid #e5e7eb', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>H1</button>
+              <button type="button" onClick={() => insertFormatting('h2')} style={{ padding: '0.5rem', background: 'white', border: '1px solid #e5e7eb', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>H2</button>
+              <button type="button" onClick={() => insertFormatting('h3')} style={{ padding: '0.5rem', background: 'white', border: '1px solid #e5e7eb', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>H3</button>
+              <button type="button" onClick={() => insertFormatting('p')} style={{ padding: '0.5rem', background: 'white', border: '1px solid #e5e7eb', borderRadius: '4px', cursor: 'pointer' }}>P</button>
+              <button type="button" onClick={() => insertFormatting('bold')} style={{ padding: '0.5rem', background: 'white', border: '1px solid #e5e7eb', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}>B</button>
+              <button type="button" onClick={() => insertFormatting('italic')} style={{ padding: '0.5rem', background: 'white', border: '1px solid #e5e7eb', borderRadius: '4px', cursor: 'pointer', fontStyle: 'italic' }}>I</button>
+              <button type="button" onClick={() => insertFormatting('ul')} style={{ padding: '0.5rem', background: 'white', border: '1px solid #e5e7eb', borderRadius: '4px', cursor: 'pointer' }}>List</button>
+              <button type="button" onClick={() => insertFormatting('link')} style={{ padding: '0.5rem', background: 'white', border: '1px solid #e5e7eb', borderRadius: '4px', cursor: 'pointer' }}>Link</button>
+            </div>
+
+            <textarea
+              id="article-content"
               value={formData.content}
               onChange={handleContentChange}
-              style={{ background: 'white', borderRadius: '8px' }}
-              modules={{
-                toolbar: [
-                  [{ 'header': [1, 2, 3, false] }],
-                  ['bold', 'italic', 'underline', 'strike'],
-                  ['blockquote', 'code-block'],
-                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                  ['link', 'image'],
-                  ['clean']
-                ]
+              required
+              data-testid="article-content-input"
+              rows="15"
+              placeholder="Write your article content with HTML tags..."
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '0.95rem',
+                fontFamily: 'monospace',
+                resize: 'vertical'
               }}
             />
+            <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.5rem' }}>
+              Use the toolbar buttons or write HTML directly. Preview will show formatted content.
+            </p>
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
