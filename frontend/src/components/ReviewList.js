@@ -144,8 +144,8 @@ const ReviewList = ({ casinoId }) => {
                   {review.comment}
                 </p>
 
-            {/* Pros & Cons */}
-            {(review.pros.length > 0 || review.cons.length > 0) && (
+                {/* Pros & Cons */}
+                {(review.pros.length > 0 || review.cons.length > 0) && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 {review.pros.length > 0 && (
                   <div>
