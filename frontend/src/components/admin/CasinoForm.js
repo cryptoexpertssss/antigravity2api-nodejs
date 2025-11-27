@@ -210,6 +210,64 @@ const CasinoForm = ({ casino, onClose }) => {
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Casino Images (Gallery)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              data-testid="casino-image-upload"
+              style={{ marginBottom: '0.5rem' }}
+            />
+            {uploadingImage && <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Uploading...</p>}
+            
+            {formData.images.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '0.5rem', marginTop: '0.5rem' }}>
+                {formData.images.map((image, index) => (
+                  <div key={index} style={{ position: 'relative' }}>
+                    <img 
+                      src={`${BACKEND_URL}${image}`}
+                      alt={`Casino ${index + 1}`}
+                      data-testid={`casino-gallery-image-${index}`}
+                      style={{
+                        width: '100%',
+                        height: '100px',
+                        objectFit: 'cover',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      data-testid={`remove-image-${index}`}
+                      style={{
+                        position: 'absolute',
+                        top: '0.25rem',
+                        right: '0.25rem',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        background: '#ef4444',
+                        color: 'white',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '0.875rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.5rem' }}>
+              Upload multiple images for casino gallery
+            </p>
+          </div>
+
+          <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Offer Title *</label>
             <input
               type="text"
