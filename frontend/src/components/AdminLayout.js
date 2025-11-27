@@ -91,13 +91,35 @@ const AdminLayout = ({ children }) => {
               color: '#d1d5db',
               fontSize: '0.95rem',
               textDecoration: 'none',
-              transition: 'color 0.2s ease'
+              transition: 'color 0.2s ease',
+              marginBottom: '0.5rem'
             }}
             onMouseEnter={(e) => e.target.style.color = '#3b82f6'}
             onMouseLeave={(e) => e.target.style.color = '#d1d5db'}
           >
             ← Back to Site
           </Link>
+          <button
+            onClick={logout}
+            data-testid="logout-btn"
+            style={{
+              display: 'block',
+              width: '100%',
+              padding: '0.75rem 1rem',
+              background: '#dc2626',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '0.95rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'background 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.background = '#b91c1c'}
+            onMouseLeave={(e) => e.target.style.background = '#dc2626'}
+          >
+            🚪 Logout
+          </button>
         </div>
       </aside>
 
