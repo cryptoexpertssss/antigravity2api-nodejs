@@ -370,6 +370,224 @@ async def upload_image(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ========= USER REVIEWS =========
+
+@api_router.post("/reviews", response_model=UserReview)
+async def create_review(input: UserReviewCreate):
+    review = UserReview(**input.model_dump())
+    doc = review.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.reviews.insert_one(doc)
+    return review
+
+@api_router.get("/reviews", response_model=List[UserReview])
+async def get_reviews(
+    casino_id: Optional[str] = None,
+    status: Optional[str] = None,
+    page: int = 1,
+    limit: int = 10
+):
+    query = {}
+    if casino_id:
+        query['casino_id'] = casino_id
+    if status:
+        query['status'] = status
+    
+    skip = (page - 1) * limit
+    reviews = await db.reviews.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    for review in reviews:
+        if isinstance(review['created_at'], str):
+            review['created_at'] = datetime.fromisoformat(review['created_at'])
+    return reviews
+
+@api_router.get("/reviews/count")
+async def get_reviews_count(casino_id: Optional[str] = None, status: Optional[str] = None):
+    query = {}
+    if casino_id:
+        query['casino_id'] = casino_id
+    if status:
+        query['status'] = status
+    count = await db.reviews.count_documents(query)
+    return {"count": count}
+
+@api_router.get("/reviews/{review_id}", response_model=UserReview)
+async def get_review(review_id: str):
+    review = await db.reviews.find_one({"id": review_id}, {"_id": 0})
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    if isinstance(review['created_at'], str):
+        review['created_at'] = datetime.fromisoformat(review['created_at'])
+    return review
+
+@api_router.put("/reviews/{review_id}/status")
+async def update_review_status(review_id: str, status: str):
+    if status not in ["pending", "approved", "rejected"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    result = await db.reviews.update_one(
+        {"id": review_id},
+        {"$set": {"status": status}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return {"message": "Review status updated successfully"}
+
+@api_router.delete("/reviews/{review_id}")
+async def delete_review(review_id: str):
+    result = await db.reviews.delete_one({"id": review_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return {"message": "Review deleted successfully"}
+
+# ========= AFFILIATE LINKS =========
+
+@api_router.post("/affiliate-links", response_model=AffiliateLink)
+async def create_affiliate_link(input: AffiliateLinkCreate):
+    link = AffiliateLink(**input.model_dump())
+    doc = link.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.affiliate_links.insert_one(doc)
+    return link
+
+@api_router.get("/affiliate-links", response_model=List[AffiliateLink])
+async def get_affiliate_links(casino_id: Optional[str] = None):
+    query = {}
+    if casino_id:
+        query['casino_id'] = casino_id
+    
+    links = await db.affiliate_links.find(query, {"_id": 0}).to_list(1000)
+    for link in links:
+        if isinstance(link['created_at'], str):
+            link['created_at'] = datetime.fromisoformat(link['created_at'])
+    return links
+
+@api_router.get("/affiliate-links/{link_id}", response_model=AffiliateLink)
+async def get_affiliate_link(link_id: str):
+    link = await db.affiliate_links.find_one({"id": link_id}, {"_id": 0})
+    if not link:
+        raise HTTPException(status_code=404, detail="Affiliate link not found")
+    if isinstance(link['created_at'], str):
+        link['created_at'] = datetime.fromisoformat(link['created_at'])
+    return link
+
+@api_router.post("/affiliate-links/{link_id}/click")
+async def track_affiliate_click(link_id: str):
+    result = await db.affiliate_links.update_one(
+        {"id": link_id},
+        {"$inc": {"clicks": 1}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Affiliate link not found")
+    return {"message": "Click tracked successfully"}
+
+@api_router.put("/affiliate-links/{link_id}", response_model=AffiliateLink)
+async def update_affiliate_link(link_id: str, input: AffiliateLinkCreate):
+    existing = await db.affiliate_links.find_one({"id": link_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Affiliate link not found")
+    
+    update_data = input.model_dump()
+    await db.affiliate_links.update_one({"id": link_id}, {"$set": update_data})
+    
+    updated = await db.affiliate_links.find_one({"id": link_id}, {"_id": 0})
+    if isinstance(updated['created_at'], str):
+        updated['created_at'] = datetime.fromisoformat(updated['created_at'])
+    return AffiliateLink(**updated)
+
+@api_router.delete("/affiliate-links/{link_id}")
+async def delete_affiliate_link(link_id: str):
+    result = await db.affiliate_links.delete_one({"id": link_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Affiliate link not found")
+    return {"message": "Affiliate link deleted successfully"}
+
+# ========= ADVERTISEMENTS =========
+
+@api_router.post("/ads", response_model=Advertisement)
+async def create_ad(input: AdvertisementCreate):
+    ad = Advertisement(**input.model_dump())
+    doc = ad.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    if doc.get('start_date'):
+        doc['start_date'] = doc['start_date'].isoformat()
+    if doc.get('end_date'):
+        doc['end_date'] = doc['end_date'].isoformat()
+    await db.advertisements.insert_one(doc)
+    return ad
+
+@api_router.get("/ads", response_model=List[Advertisement])
+async def get_ads(position: Optional[str] = None, active_only: bool = False):
+    query = {}
+    if position:
+        query['position'] = position
+    if active_only:
+        query['is_active'] = True
+        # Check date range if specified
+        now = datetime.now(timezone.utc).isoformat()
+        query['$or'] = [
+            {"start_date": None, "end_date": None},
+            {"start_date": {"$lte": now}, "end_date": None},
+            {"start_date": None, "end_date": {"$gte": now}},
+            {"start_date": {"$lte": now}, "end_date": {"$gte": now}}
+        ]
+    
+    ads = await db.advertisements.find(query, {"_id": 0}).to_list(1000)
+    for ad in ads:
+        if isinstance(ad['created_at'], str):
+            ad['created_at'] = datetime.fromisoformat(ad['created_at'])
+        if ad.get('start_date') and isinstance(ad['start_date'], str):
+            ad['start_date'] = datetime.fromisoformat(ad['start_date'])
+        if ad.get('end_date') and isinstance(ad['end_date'], str):
+            ad['end_date'] = datetime.fromisoformat(ad['end_date'])
+    return ads
+
+@api_router.post("/ads/{ad_id}/impression")
+async def track_ad_impression(ad_id: str):
+    result = await db.advertisements.update_one(
+        {"id": ad_id},
+        {"$inc": {"impressions": 1}}
+    )
+    return {"message": "Impression tracked"}
+
+@api_router.post("/ads/{ad_id}/click")
+async def track_ad_click(ad_id: str):
+    result = await db.advertisements.update_one(
+        {"id": ad_id},
+        {"$inc": {"clicks": 1}}
+    )
+    return {"message": "Click tracked"}
+
+@api_router.put("/ads/{ad_id}", response_model=Advertisement)
+async def update_ad(ad_id: str, input: AdvertisementCreate):
+    existing = await db.advertisements.find_one({"id": ad_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Advertisement not found")
+    
+    update_data = input.model_dump()
+    if update_data.get('start_date'):
+        update_data['start_date'] = update_data['start_date'].isoformat()
+    if update_data.get('end_date'):
+        update_data['end_date'] = update_data['end_date'].isoformat()
+    
+    await db.advertisements.update_one({"id": ad_id}, {"$set": update_data})
+    
+    updated = await db.advertisements.find_one({"id": ad_id}, {"_id": 0})
+    if isinstance(updated['created_at'], str):
+        updated['created_at'] = datetime.fromisoformat(updated['created_at'])
+    if updated.get('start_date') and isinstance(updated['start_date'], str):
+        updated['start_date'] = datetime.fromisoformat(updated['start_date'])
+    if updated.get('end_date') and isinstance(updated['end_date'], str):
+        updated['end_date'] = datetime.fromisoformat(updated['end_date'])
+    return Advertisement(**updated)
+
+@api_router.delete("/ads/{ad_id}")
+async def delete_ad(ad_id: str):
+    result = await db.advertisements.delete_one({"id": ad_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Advertisement not found")
+    return {"message": "Advertisement deleted successfully"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
