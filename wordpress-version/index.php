@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'includes/functions.php';
 
 // Get featured article
 $featured = $pdo->query("SELECT a.*, c.name as category_name FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.status='published' ORDER BY a.created_at DESC LIMIT 1")->fetch();
