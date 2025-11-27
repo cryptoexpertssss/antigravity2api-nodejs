@@ -1,0 +1,32 @@
+# Enable mod_rewrite
+RewriteEngine On
+
+# Security - Hide sensitive files
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Protect uploads directory from PHP execution
+<Directory "uploads">
+    php_flag engine off
+</Directory>
+
+# SEO Friendly URLs (Optional - uncomment to enable)
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^article/([^/]+)$ article.php?slug=$1 [L,QSA]
+# RewriteRule ^category/([0-9]+)$ category.php?id=$1 [L,QSA]
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Disable directory browsing
+Options -Indexes
+
+# Default document
+DirectoryIndex index.php index.html
