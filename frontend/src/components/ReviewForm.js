@@ -133,6 +133,28 @@ const ReviewForm = ({ casinoId, casinoName, onClose }) => {
         </div>
 
         <div style={{ marginBottom: '1.5rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Profile Picture (Optional)</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarUpload}
+            data-testid="review-avatar-input"
+            style={{ marginBottom: '0.5rem' }}
+          />
+          {uploadingAvatar && <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Uploading...</p>}
+          {formData.user_avatar && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
+              <img 
+                src={`${BACKEND_URL}${formData.user_avatar}`}
+                alt="Profile"
+                style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' }}
+              />
+              <span style={{ fontSize: '0.875rem', color: '#059669' }}>✓ Profile picture uploaded</span>
+            </div>
+          )}
+        </div>
+
+        <div style={{ marginBottom: '1.5rem' }}>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>Rating *</label>
           <select
             name="rating"
