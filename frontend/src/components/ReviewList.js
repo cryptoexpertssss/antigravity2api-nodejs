@@ -71,27 +71,66 @@ const ReviewList = ({ casinoId }) => {
             }}
           >
             {/* Review Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: '700' }} data-testid={`review-title-${review.id}`}>
-                    {review.title}
-                  </h3>
-                  {review.is_verified && (
-                    <span style={{
-                      padding: '0.25rem 0.75rem',
-                      background: '#d1fae5',
-                      color: '#065f46',
-                      borderRadius: '20px',
-                      fontSize: '0.75rem',
-                      fontWeight: '600'
-                    }}>Verified</span>
-                  )}
-                </div>
-                <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                  By {review.user_name} • {formatDate(review.created_at)}
-                </div>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+              {/* User Avatar */}
+              <div style={{ flexShrink: 0 }}>
+                {review.user_avatar ? (
+                  <img 
+                    src={`${BACKEND_URL}${review.user_avatar}`}
+                    alt={review.user_name}
+                    data-testid={`review-avatar-${review.id}`}
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '2px solid #e5e7eb'
+                    }}
+                  />
+                ) : (
+                  <div 
+                    data-testid={`review-default-avatar-${review.id}`}
+                    style={{
+                      width: '60px',
+                      height: '60px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.5rem',
+                      fontWeight: '700',
+                      color: 'white'
+                    }}
+                  >
+                    {review.user_name.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </div>
+
+              {/* Review Content */}
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.25rem' }}>
+                      <h3 style={{ fontSize: '1.25rem', fontWeight: '700' }} data-testid={`review-title-${review.id}`}>
+                        {review.title}
+                      </h3>
+                      {review.is_verified && (
+                        <span style={{
+                          padding: '0.25rem 0.75rem',
+                          background: '#d1fae5',
+                          color: '#065f46',
+                          borderRadius: '20px',
+                          fontSize: '0.75rem',
+                          fontWeight: '600'
+                        }}>✓ Verified</span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                      By <strong>{review.user_name}</strong> • {formatDate(review.created_at)}
+                    </div>
+                  </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <div style={{ color: '#fbbf24', fontSize: '1.25rem' }} data-testid={`review-rating-${review.id}`}>
                   {'★'.repeat(Math.floor(review.rating))}
