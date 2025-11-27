@@ -10,6 +10,7 @@ const CasinoForm = ({ casino, onClose }) => {
     name: "",
     rank: 1,
     logo_url: "",
+    images: [],
     offer_title: "",
     offer_details: "",
     features: [""],
@@ -19,6 +20,7 @@ const CasinoForm = ({ casino, onClose }) => {
     rating: 5.0,
     is_featured: false
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     if (casino) {
