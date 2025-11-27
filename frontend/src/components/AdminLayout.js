@@ -1,8 +1,10 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { logout, getUser } from "../utils/auth";
 
 const AdminLayout = ({ children }) => {
   const location = useLocation();
+  const user = getUser();
 
   const isActive = (path) => location.pathname === path;
 
