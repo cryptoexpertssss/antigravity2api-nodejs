@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  antigravity2api:
+    build: .
+    ports:
+      - "8045:8045"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./public/images:/app/public/images
+      - ./.env:/app/.env
+    restart: unless-stopped

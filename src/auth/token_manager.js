@@ -189,6 +189,100 @@ class TokenManager {
       this.disableToken(found);
     }
   }
+
+  // API管理方法
+  async reload() {
+    await this.initialize();
+    log.info('Token已热重载');
+  }
+
+  addToken(tokenData) {
+    try {
+      const data = fs.readFileSync(this.filePath, 'utf8');
+      const allTokens = JSON.parse(data);
+      
+      const newToken = {
+        access_token: tokenData.access_token,
+        refresh_token: tokenData.refresh_token,
+        expires_in: tokenData.expires_in || 3599,
+        timestamp: tokenData.timestamp || Date.now(),
+        enable: tokenData.enable !== undefined ? tokenData.enable : true
+      };
+      
+      if (tokenData.projectId) {
+        newToken.projectId = tokenData.projectId;
+      }
+      
+      allTokens.push(newToken);
+      fs.writeFileSync(this.filePath, JSON.stringify(allTokens, null, 2), 'utf8');
+      
+      this.reload();
+      return { success: true, message: 'Token添加成功' };
+    } catch (error) {
+      log.error('添加Token失败:', error.message);
+      return { success: false, message: error.message };
+    }
+  }
+
+  updateToken(refreshToken, updates) {
+    try {
+      const data = fs.readFileSync(this.filePath, 'utf8');
+      const allTokens = JSON.parse(data);
+      
+      const index = allTokens.findIndex(t => t.refresh_token === refreshToken);
+      if (index === -1) {
+        return { success: false, message: 'Token不存在' };
+      }
+      
+      allTokens[index] = { ...allTokens[index], ...updates };
+      fs.writeFileSync(this.filePath, JSON.stringify(allTokens, null, 2), 'utf8');
+      
+      this.reload();
+      return { success: true, message: 'Token更新成功' };
+    } catch (error) {
+      log.error('更新Token失败:', error.message);
+      return { success: false, message: error.message };
+    }
+  }
+
+  deleteToken(refreshToken) {
+    try {
+      const data = fs.readFileSync(this.filePath, 'utf8');
+      const allTokens = JSON.parse(data);
+      
+      const filteredTokens = allTokens.filter(t => t.refresh_token !== refreshToken);
+      if (filteredTokens.length === allTokens.length) {
+        return { success: false, message: 'Token不存在' };
+      }
+      
+      fs.writeFileSync(this.filePath, JSON.stringify(filteredTokens, null, 2), 'utf8');
+      
+      this.reload();
+      return { success: true, message: 'Token删除成功' };
+    } catch (error) {
+      log.error('删除Token失败:', error.message);
+      return { success: false, message: error.message };
+    }
+  }
+
+  getTokenList() {
+    try {
+      const data = fs.readFileSync(this.filePath, 'utf8');
+      const allTokens = JSON.parse(data);
+      
+      return allTokens.map(token => ({
+        refresh_token: token.refresh_token,
+        access_token_suffix: token.access_token ? `...${token.access_token.slice(-8)}` : 'N/A',
+        expires_in: token.expires_in,
+        timestamp: token.timestamp,
+        enable: token.enable !== false,
+        projectId: token.projectId || null
+      }));
+    } catch (error) {
+      log.error('获取Token列表失败:', error.message);
+      return [];
+    }
+  }
 }
 const tokenManager = new TokenManager();
 export default tokenManager;

@@ -24,6 +24,11 @@ DEFAULT_MAX_TOKENS=8096
 MAX_REQUEST_SIZE=50mb
 API_KEY=sk-text
 
+# 管理员认证
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+JWT_SECRET=your-jwt-secret-key-change-this-in-production
+
 # 其他配置
 USE_NATIVE_AXIOS=false
 TIMEOUT=180000
@@ -66,6 +71,11 @@ const config = {
   security: {
     maxRequestSize: process.env.MAX_REQUEST_SIZE || '50mb',
     apiKey: process.env.API_KEY || null
+  },
+  admin: {
+    username: process.env.ADMIN_USERNAME || 'admin',
+    password: process.env.ADMIN_PASSWORD || 'admin123',
+    jwtSecret: process.env.JWT_SECRET || 'your-jwt-secret-key-change-this-in-production'
   },
   useNativeAxios: process.env.USE_NATIVE_AXIOS !== 'false',
   timeout: parseInt(process.env.TIMEOUT) || 30000,
