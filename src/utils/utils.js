@@ -5,7 +5,7 @@ import os from 'os';
 import { getReasoningSignature, getToolSignature } from './thoughtSignatureCache.js';
 import { setToolNameMapping } from './toolNameCache.js';
 
-// 思维链签名常量 - 暂时123占位
+// 思维链签名常量
 // Claude 模型签名
 const CLAUDE_THOUGHT_SIGNATURE = 'RXFRRENrZ0lDaEFDR0FJcVFKV1Bvcy9GV20wSmtMV2FmWkFEbGF1ZTZzQTdRcFlTc1NvbklmemtSNFo4c1dqeitIRHBOYW9hS2NYTE1TeTF3bjh2T1RHdE1KVjVuYUNQclZ5cm9DMFNETHk4M0hOSWsrTG1aRUhNZ3hvTTl0ZEpXUDl6UUMzOExxc2ZJakI0UkkxWE1mdWJ1VDQrZnY0Znp0VEoyTlhtMjZKL2daYi9HL1gwcmR4b2x0VE54empLemtLcEp0ZXRia2plb3NBcWlRSWlXUHloMGhVVTk1dHNha1dyNDVWNUo3MTJjZDNxdHQ5Z0dkbjdFaFk4dUllUC9CcThVY2VZZC9YbFpYbDc2bHpEbmdzL2lDZXlNY3NuZXdQMjZBTDRaQzJReXdibVQzbXlSZmpld3ZSaUxxOWR1TVNidHIxYXRtYTJ0U1JIRjI0Z0JwUnpadE1RTmoyMjR4bTZVNUdRNXlOSWVzUXNFNmJzRGNSV0RTMGFVOEZERExybmhVQWZQT2JYMG5lTGR1QnU1VGZOWW9NZGlRbTgyUHVqVE1xaTlmN0t2QmJEUUdCeXdyVXR2eUNnTEFHNHNqeWluZDRCOEg3N2ZJamt5blI3Q3ZpQzlIOTVxSENVTCt3K3JzMmsvV0sxNlVsbGlTK0pET3UxWXpPMWRPOUp3V3hEMHd5ZVU0a0Y5MjIxaUE5Z2lUd2djZXhSU2c4TWJVMm1NSjJlaGdlY3g0YjJ3QloxR0FFPQ==';
 // Gemini 思维链签名
@@ -496,10 +496,10 @@ function generateGeminiRequestBody(geminiBody, modelName, token){
   const request = JSON.parse(JSON.stringify(geminiBody));
   //console.log(JSON.stringify(request,null,2));
   
-  // 处理 contents 中的 functionCall 和 functionResponse，确保有 id 字段
+  // 处理 contents 中的 functionCall 和 functionResponse，确保 id 匹配
   if (request.contents && Array.isArray(request.contents)) {
-    // 第一遍：收集所有 functionCall 的 name -> id 映射
-    const functionCallIds = new Map();
+    // 收集所有 functionCall 的 id（按顺序）
+    const functionCallIds = [];
     request.contents.forEach(content => {
       if (content.role === 'model' && content.parts && Array.isArray(content.parts)) {
         content.parts.forEach(part => {
@@ -507,25 +507,47 @@ function generateGeminiRequestBody(geminiBody, modelName, token){
             if (!part.functionCall.id) {
               part.functionCall.id = `call_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             }
-            // 记录 name -> id 映射
-            functionCallIds.set(part.functionCall.name, part.functionCall.id);
+            functionCallIds.push(part.functionCall.id);
           }
         });
       }
     });
     
-    // 第二遍：为 functionResponse 匹配对应的 id
+    // 为 functionResponse 匹配对应的 functionCall id
+    let responseIndex = 0;
     request.contents.forEach(content => {
       if (content.role === 'user' && content.parts && Array.isArray(content.parts)) {
         content.parts.forEach(part => {
-          if (part.functionResponse && !part.functionResponse.id) {
-            // 尝试从映射中找到对应的 id
-            const matchedId = functionCallIds.get(part.functionResponse.name);
-            part.functionResponse.id = matchedId || `call_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          if (part.functionResponse) {
+            // 如果没有 id，按顺序匹配 functionCall 的 id
+            if (!part.functionResponse.id && responseIndex < functionCallIds.length) {
+              part.functionResponse.id = functionCallIds[responseIndex];
+              responseIndex++;
+            }
           }
         });
       }
     });
+    
+    // 处理思考模型的思维链
+    if (enableThinking) {
+      const cachedSig = getReasoningSignature(token.sessionId, actualModelName);
+      const thoughtSignature = cachedSig || getThoughtSignatureForModel(actualModelName);
+      
+      request.contents.forEach(content => {
+        if (content.role === 'model' && content.parts && Array.isArray(content.parts)) {
+          // 检查是否已有思维链标记
+          const hasThought = content.parts.some(p => p.thought === true);
+          if (!hasThought) {
+            // 在 parts 开头插入思维链占位符和签名
+            content.parts.unshift(
+              { text: ' ', thought: true },
+              { text: ' ', thoughtSignature },
+            );
+          }
+        }
+      });
+    }
   }
   
   // 确保 generationConfig 存在
@@ -560,6 +582,7 @@ function generateGeminiRequestBody(geminiBody, modelName, token){
     model: actualModelName,
     userAgent: "antigravity"
   };
+  //console.log(JSON.stringify(requestBody, null, 2))
   
   return requestBody;
 }
@@ -854,6 +877,7 @@ function generateClaudeRequestBody(claudeMessages, modelName, parameters, claude
       parts: [{ text: mergedSystem }]
     };
   }
+  //console.log(JSON.stringify(requestBody, null, 2));
   
   return requestBody;
 }
