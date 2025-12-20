@@ -48,13 +48,13 @@ function handleAssistantMessage(message, antigravityMessages, enableThinking, ac
   const hasToolCalls = message.tool_calls && message.tool_calls.length > 0;
   const hasContent = message.content && message.content.trim() !== '';
   const { reasoningSignature, toolSignature } = getSignatureContext(sessionId, actualModelName);
-  
+
   const toolCalls = hasToolCalls
     ? message.tool_calls.map(toolCall => {
-        const safeName = processToolName(toolCall.function.name, sessionId, actualModelName);
-        const signature = enableThinking ? (toolCall.thoughtSignature || toolSignature) : null;
-        return createFunctionCallPart(toolCall.id, safeName, toolCall.function.arguments, signature);
-      })
+      const safeName = processToolName(toolCall.function.name, sessionId, actualModelName);
+      const signature = enableThinking ? (toolCall.thoughtSignature || toolSignature) : null;
+      return createFunctionCallPart(toolCall.id, safeName, toolCall.function.arguments, signature);
+    })
     : [];
 
   const parts = [];
@@ -86,7 +86,7 @@ function openaiMessageToAntigravity(openaiMessages, enableThinking, actualModelN
       handleToolCall(message, antigravityMessages);
     }
   }
-  console.log(JSON.stringify(antigravityMessages,null,2));
+  //console.log(JSON.stringify(antigravityMessages,null,2));
   return antigravityMessages;
 }
 
@@ -94,7 +94,7 @@ export function generateRequestBody(openaiMessages, modelName, parameters, opena
   const enableThinking = isEnableThinking(modelName);
   const actualModelName = modelMapping(modelName);
   const mergedSystemInstruction = extractSystemInstruction(openaiMessages);
-  
+
   let filteredMessages = openaiMessages;
   let startIndex = 0;
   if (config.useContextSystemPrompt) {
